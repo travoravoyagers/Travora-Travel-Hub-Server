@@ -4,12 +4,15 @@ A modern backend service powering the Travora Travel Hub application.
 Designed for travelers to connect, share journeys, and plan trips.
 Built with production-ready technologies including Node.js, Express, Prisma, PostgreSQL, and JWT authentication.
 
-🚀 Getting Started
+Getting Started
+
 1. Clone the repository
+
 git clone https://github.com/travoravoyagers/Travora-Travel-Hub-Server.git
 cd Travora-Travel-Hub-Server
 
 2. Install dependencies
+
 npm install
 
 3. Create .env file
@@ -32,17 +35,18 @@ Run migrations:
 npx prisma migrate dev --name init
 
 5. Start the development server
+
 npm run dev
 
 Server will start on:
 
 http://localhost:4000
 
-📘 API Documentation (Swagger)
+API Documentation (Swagger)
 
 Once the server is running, open:
 
-👉 http://localhost:4000/api/docs
+http://localhost:4000/api/docs
 
 📝 License
 
