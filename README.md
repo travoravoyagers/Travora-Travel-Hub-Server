@@ -47,7 +47,3 @@ API Documentation (Swagger)
 Once the server is running, open:
 
 http://localhost:4000/api/docs
-
-📝 License
-
-MIT License
