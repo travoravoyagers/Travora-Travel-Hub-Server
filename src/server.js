@@ -13,7 +13,7 @@ app.use(express.json());
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
-  res.json({ message: "Traveller API is running" });
+  res.json({ message: "Travora API is running" });
 });
 
 const authRoutes = require("./routes/auth.routes");
