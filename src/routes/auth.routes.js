@@ -28,6 +28,9 @@ const authMiddleware = require("../middleware/auth");
  *                 type: string
  *                 format: email
  *                 example: test@example.com
+ *               mobile:
+ *                  type: string
+ *                  example: 9995559990
  *               password:
  *                 type: string
  *                 format: password
