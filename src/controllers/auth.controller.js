@@ -4,7 +4,7 @@ const prisma = require("../config/prisma");
 
 const normalizeEmail = (email) => email.trim().toLowerCase();
 
-// Helper to generate JWT
+// JWT helper
 const generateToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email },
@@ -13,34 +13,45 @@ const generateToken = (user) => {
   );
 };
 
+// =======================
 // REGISTER
+// =======================
 module.exports.register = async (req, res) => {
   try {
-    let { name, email, password } = req.body;
+    let { name, email, mobile, password } = req.body;
 
-    // Basic validation
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    // Validation
+    if (!email || !mobile || !password) {
+      return res.status(400).json({
+        message: "Email, mobile number, and password are required",
+      });
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+      return res.status(400).json({
+        message: "Enter a valid 10-digit mobile number",
+      });
     }
 
     email = normalizeEmail(email);
 
-    // Simple password rule (you can make this stricter later)
     if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 8 characters long" });
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long",
+      });
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Check existing user (email OR mobile)
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { mobile }],
+      },
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({
+        message: "Email or mobile already registered",
+      });
     }
 
     // Hash password
@@ -51,12 +62,14 @@ module.exports.register = async (req, res) => {
       data: {
         name,
         email,
+        mobile,
         passwordHash,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        mobile: true,
         createdAt: true,
       },
     });
@@ -69,12 +82,14 @@ module.exports.register = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
-// LOGIN
+// =======================
+// LOGIN (EMAIL ONLY – SAFE)
+// =======================
 module.exports.login = async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -91,7 +106,6 @@ module.exports.login = async (req, res) => {
       where: { email },
     });
 
-    // Use same message for both: don't reveal if email exists
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -109,15 +123,17 @@ module.exports.login = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
+// =======================
 // ME (CURRENT USER)
+// =======================
 module.exports.me = async (req, res) => {
   try {
-    const userId = req.user.id; // from authMiddleware
+    const userId = req.user.id;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -125,6 +141,7 @@ module.exports.me = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        mobile: true,
         createdAt: true,
       },
     });
@@ -135,7 +152,7 @@ module.exports.me = async (req, res) => {
 
     return res.json({ user });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
