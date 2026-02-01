@@ -12,6 +12,7 @@ module.exports.getProfile = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        mobile: true,
         profileImage: true,
         createdAt: true,
         updatedAt: true,
