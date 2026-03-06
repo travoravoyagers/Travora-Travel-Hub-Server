@@ -1,8 +1,12 @@
 const prisma = require("../config/prisma");
 
+
+// =======================
 // CREATE TRIP
+// =======================
 module.exports.createTrip = async (req, res) => {
   try {
+
     const userId = req.user.id;
     const { title, description, startDate, endDate } = req.body;
 
@@ -43,9 +47,13 @@ module.exports.createTrip = async (req, res) => {
 };
 
 
+
+// =======================
 // GET USER TRIPS
+// =======================
 module.exports.getTrips = async (req, res) => {
   try {
+
     const userId = req.user.id;
 
     const trips = await prisma.trip.findMany({
@@ -62,6 +70,57 @@ module.exports.getTrips = async (req, res) => {
     });
 
     return res.json({ trips });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+// =======================
+// DELETE TRIP
+// =======================
+module.exports.deleteTrip = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const trip = await prisma.trip.findUnique({
+      where: { id }
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found"
+      });
+    }
+
+    if (trip.created_by !== userId) {
+      return res.status(403).json({
+        message: "You are not allowed to delete this trip"
+      });
+    }
+
+    // delete trip members first
+    await prisma.tripMember.deleteMany({
+      where: {
+        trip_id: id
+      }
+    });
+
+    // delete trip
+    await prisma.trip.delete({
+      where: {
+        id
+      }
+    });
+
+    return res.json({
+      message: "Trip deleted successfully"
+    });
 
   } catch (error) {
     console.log(error);
