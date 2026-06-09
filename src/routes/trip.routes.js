@@ -7,7 +7,10 @@ const {
   getTrips,
   deleteTrip,
   addItineraryDay,
-  getItinerary
+  getItinerary,
+  updateTrip,
+  updateItineraryEntry,
+  deleteItineraryEntry
 } = require("../controllers/trip.controller");
 
 
@@ -166,5 +169,117 @@ router.post("/:tripId/itinerary", authMiddleware, addItineraryDay);
  */
 router.get("/:tripId/itinerary", authMiddleware, getItinerary);
 
+
+// =======================
+// UPDATE TRIP
+// =======================
+/**
+ * @openapi
+ * /api/trips/{tripId}:
+ *   put:
+ *     summary: Update a trip
+ *     tags:
+ *       - Trips
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Trip updated successfully
+ */
+router.put("/:tripId", authMiddleware, updateTrip);
+
+
+// =======================
+// UPDATE ITINERARY ENTRY
+// =======================
+/**
+ * @openapi
+ * /api/trips/{tripId}/itinerary/{entryId}:
+ *   put:
+ *     summary: Update an itinerary entry
+ *     tags:
+ *       - Trips
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: entryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Entry updated
+ */
+router.put("/:tripId/itinerary/:entryId", authMiddleware, updateItineraryEntry);
+
+
+// =======================
+// DELETE ITINERARY ENTRY
+// =======================
+/**
+ * @openapi
+ * /api/trips/{tripId}/itinerary/{entryId}:
+ *   delete:
+ *     summary: Delete an itinerary entry
+ *     tags:
+ *       - Trips
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: entryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Entry deleted
+ */
+router.delete("/:tripId/itinerary/:entryId", authMiddleware, deleteItineraryEntry);
 
 module.exports = router;
