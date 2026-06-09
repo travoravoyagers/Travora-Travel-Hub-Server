@@ -8,12 +8,16 @@ module.exports.createTrip = async (req, res) => {
   try {
 
     const userId = req.user.id;
-    const { title, description, startDate, endDate } = req.body;
+    let { title, description, startDate, endDate } = req.body;
 
-    if (!title || !startDate || !endDate) {
+    if (!title || !startDate) {
       return res.status(400).json({
-        message: "Title, startDate and endDate are required"
+        message: "Title and startDate are required"
       });
+    }
+
+    if (!endDate) {
+      endDate = startDate;
     }
 
     const trip = await prisma.trip.create({
@@ -212,11 +216,15 @@ module.exports.updateTrip = async (req, res) => {
   try {
     const { tripId } = req.params;
     const userId = req.user.id;
-    const { title, description, startDate, endDate } = req.body;
+    let { title, description, startDate, endDate } = req.body;
 
     const trip = await prisma.trip.findUnique({ where: { id: tripId } });
     if (!trip) return res.status(404).json({ message: "Trip not found" });
     if (trip.created_by !== userId) return res.status(403).json({ message: "Not allowed" });
+
+    if (!endDate && startDate) {
+      endDate = startDate;
+    }
 
     const updatedTrip = await prisma.trip.update({
       where: { id: tripId },
