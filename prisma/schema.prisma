@@ -29,6 +29,7 @@ model Trip {
   created_at  DateTime
 
   members     TripMember[]
+  itinerary   ItineraryDay[]   // 👈 ADD THIS
 
   @@map("trips")
 }
@@ -44,4 +45,16 @@ model TripMember {
   user      User @relation(fields: [user_id], references: [id])
 
   @@map("trip_members")
+}
+
+model ItineraryDay {
+  id          String   @id @default(uuid())
+  trip_id     String
+  day_number  Int
+  content     String
+  created_at  DateTime @default(now())
+
+  trip        Trip @relation(fields: [trip_id], references: [id])
+
+  @@map("itinerary_days")
 }
