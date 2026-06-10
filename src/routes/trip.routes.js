@@ -10,7 +10,13 @@ const {
   getItinerary,
   updateTrip,
   updateItineraryEntry,
-  deleteItineraryEntry
+  deleteItineraryEntry,
+  requestJoinTrip,
+  inviteToTrip,
+  getTripRequests,
+  respondToTripRequest,
+  getTripById,
+  makeMemberAdmin
 } = require("../controllers/trip.controller");
 
 
@@ -281,5 +287,16 @@ router.put("/:tripId/itinerary/:entryId", authMiddleware, updateItineraryEntry);
  *         description: Entry deleted
  */
 router.delete("/:tripId/itinerary/:entryId", authMiddleware, deleteItineraryEntry);
+
+// =======================
+// TRIP REQUESTS & INVITES
+// =======================
+router.post("/:tripId/request-join", authMiddleware, requestJoinTrip);
+router.post("/:tripId/invite", authMiddleware, inviteToTrip);
+router.get("/requests", authMiddleware, getTripRequests);
+router.post("/requests/:memberId/respond", authMiddleware, respondToTripRequest);
+
+router.get("/:tripId", authMiddleware, getTripById);
+router.put("/:tripId/members/:memberId/admin", authMiddleware, makeMemberAdmin);
 
 module.exports = router;

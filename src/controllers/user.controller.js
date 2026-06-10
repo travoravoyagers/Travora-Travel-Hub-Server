@@ -123,3 +123,77 @@ module.exports.changePassword = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+module.exports.getPublicProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        profileImage: true,
+        createdAt: true,
+      }
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const tripCount = await prisma.tripMember.count({
+      where: { user_id: userId }
+    });
+
+    return res.json({
+      id: user.id,
+      name: user.name,
+      profileImage: user.profileImage,
+      joinedDate: user.createdAt,
+      tripCount
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports.getUserTrips = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const trips = await prisma.trip.findMany({
+      where: {
+        members: {
+          some: { user_id: userId }
+        }
+      },
+      orderBy: { start_date: "desc" }
+    });
+    return res.json({ trips });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports.getUserItinerary = async (req, res) => {
+  try {
+    const { userId, tripId } = req.params;
+    
+    const member = await prisma.tripMember.findFirst({
+      where: { trip_id: tripId, user_id: userId }
+    });
+
+    if (!member) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    const days = await prisma.itineraryDay.findMany({
+      where: { trip_id: tripId },
+      orderBy: { day_number: "asc" }
+    });
+
+    return res.json({ days });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

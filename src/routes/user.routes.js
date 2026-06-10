@@ -6,6 +6,9 @@ const {
   getProfile,
   updateProfile,
   changePassword,
+  getPublicProfile,
+  getUserTrips,
+  getUserItinerary
 } = require("../controllers/user.controller");
 
 /**
@@ -89,5 +92,73 @@ router.put("/profile", authMiddleware, updateProfile);
  */
 router.put("/change-password", authMiddleware, changePassword);
 
+
+/**
+ * @openapi
+ * /api/user/{userId}:
+ *   get:
+ *     summary: Get a user's public profile
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User profile
+ */
+router.get("/:userId", authMiddleware, getPublicProfile);
+
+/**
+ * @openapi
+ * /api/user/{userId}/trips:
+ *   get:
+ *     summary: Get a user's public trips
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of user's trips
+ */
+router.get("/:userId/trips", authMiddleware, getUserTrips);
+
+/**
+ * @openapi
+ * /api/user/{userId}/trips/{tripId}/itinerary:
+ *   get:
+ *     summary: Get a user's public trip itinerary
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Trip itinerary days
+ */
+router.get("/:userId/trips/:tripId/itinerary", authMiddleware, getUserItinerary);
 
 module.exports = router;
